@@ -17,7 +17,7 @@ def send_fonts(path):
 def send_queue():
     up_next = music_queue.get_queue()
     if up_next:
-        text_str = "UP NEXT:\n"
+        text_str = "UP NEXT\n"
         for i, track in enumerate(up_next):
             text_str += "{}. {}\n".format(i+1,track['name'])
         output_list = text_str[:-1].split('\n')

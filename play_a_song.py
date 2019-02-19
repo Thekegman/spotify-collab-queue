@@ -66,8 +66,9 @@ class MusicQueue:
     def get_queue(self):
         print("get_Queue enter")
         with self.track_queue.mutex:
-            return list(self.track_queue.queue)
+            track_list = list(self.track_queue.queue)
         print("get_Queue exit")
+        return track_list
         
     def clear(self):
             print("clear enter")
@@ -103,8 +104,8 @@ class MusicQueue:
             print("getting from queue")
             track = self.track_queue.get()
             print("got from queue")
-            if self.reset:
-                print("reset cleared")
+            if self.skip_sleep:
+                print("skip_sleep cleared")
                 with self.track_queue.mutex:
                     self.skip_sleep = False
             track_duration_sec = track['duration_ms']/1000.0
