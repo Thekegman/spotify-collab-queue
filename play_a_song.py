@@ -1,6 +1,6 @@
 from urllib.request import Request, urlopen
 from urllib.parse import urlencode
-from threading import Thread
+from threading import Thread, Event
 import queue
 import json
 import time
@@ -57,7 +57,7 @@ class MusicQueue:
     def __init__(self):
         self.track_queue = queue.Queue()
         self.track_history = []
-        self.skip_sleep = False
+        self.skip_sleep = Event()
         self.running_ind = 0
         
         self.queue_dispatcher = Thread(target=self.run, args=(int(self.running_ind),))
@@ -73,14 +73,13 @@ class MusicQueue:
     def clear(self):
             print("clear enter")
             with self.track_queue.mutex:
-                self.skip_sleep = True
                 self.track_queue.queue.clear()
+            self.skip_sleep.set()
             print("clear exit")
             
     def skip(self):
             print("skip enter")
-            with self.track_queue.mutex:
-                self.skip_sleep = True
+            self.skip_sleep.set()
             print("skip exit")
             
     def add(self, song_query):
@@ -104,10 +103,6 @@ class MusicQueue:
             print("getting from queue")
             track = self.track_queue.get()
             print("got from queue")
-            if self.skip_sleep:
-                print("skip_sleep cleared")
-                with self.track_queue.mutex:
-                    self.skip_sleep = False
             track_duration_sec = track['duration_ms']/1000.0
             track_uris.append(track['uri'])
             print("pushing: " +track['name'])
@@ -115,13 +110,9 @@ class MusicQueue:
             play_tracks(track_uris, access_token)
             t1 = time.perf_counter()
             elapsed = 0
-            print("entering sleep loop")
-            while not self.skip_sleep and elapsed < track_duration_sec:
-                sleep_time = min(0.5, track_duration_sec - elapsed)
-                time.sleep(sleep_time)
-                elapsed = time.perf_counter() - t1
-                    
-                
+            print("entering sleep")
+            print("skipped: ",self.skip_sleep.wait(track_duration_sec))
+            self.skip_sleep.clear()
 
          
 if __name__ == "__main__":
