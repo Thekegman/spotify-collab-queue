@@ -28,12 +28,12 @@ def send_queue():
 @app.route('/clear_queue')
 def send_clear():
     music_queue.clear()
-    return "cleared"
+    return render_template("plain.html",text ="cleared" )
 
 @app.route('/skip')
 def send_skip():
     music_queue.skip()
-    return "skipped"
+    return render_template("plain.html",text ="skipped" )
 
 @app.route('/', methods=['GET'])
 def root():

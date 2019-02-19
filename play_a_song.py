@@ -102,6 +102,7 @@ class MusicQueue:
             track_uris = []
             print("getting from queue")
             track = self.track_queue.get()
+            self.skip_sleep.clear()
             print("got from queue")
             track_duration_sec = track['duration_ms']/1000.0
             track_uris.append(track['uri'])
@@ -112,7 +113,7 @@ class MusicQueue:
             elapsed = 0
             print("entering sleep")
             print("skipped: ",self.skip_sleep.wait(track_duration_sec))
-            self.skip_sleep.clear()
+            
 
          
 if __name__ == "__main__":
