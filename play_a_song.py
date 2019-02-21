@@ -1,3 +1,4 @@
+import urllib
 from urllib.request import Request, urlopen
 from urllib.parse import urlencode
 from threading import Thread, Event
@@ -17,6 +18,7 @@ def request_access_token():
     data = urlencode(parameters).encode()
     request = Request(url, data, headers)
     response =  json.loads(urlopen(request).read())
+    print(response)
     return response['access_token']
 
 def search_track(query, access_token):
@@ -27,6 +29,7 @@ def search_track(query, access_token):
     
     request = Request(url+'?'+data, None, headers)
     response = json.loads(urlopen(request).read())
+    print(response)
     if not response['tracks']['items']:
         print("Error: Artist Not Found")
         return None
@@ -38,8 +41,13 @@ def play_tracks(track_uris, access_token):
     parameters = {'uris':track_uris}
     headers = {'Authorization': 'Bearer '+access_token}
     data = json.dumps(parameters).encode()
+    print(url,data,headers,"PUT")
     request = Request(url,data, headers, method='PUT')
-    urlopen(request)	
+    try:
+        print(urlopen(request))
+    except urllib.error.URLError as e:
+        print(e.reason)
+    
 	
 def im_feeling_lucky(song_query):
     access_token = request_access_token()

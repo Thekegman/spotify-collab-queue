@@ -44,8 +44,10 @@ def root():
         return html
     else:
         return app.send_static_file('index.html')
-	
-
+    
+music_queue = play_a_song.MusicQueue()
+def get_app():
+    app = Flask(__name__)
+    
 if __name__ == "__main__":
-    music_queue = play_a_song.MusicQueue()
     app.run(debug=False,host='0.0.0.0')
