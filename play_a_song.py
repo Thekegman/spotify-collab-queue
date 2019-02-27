@@ -44,7 +44,7 @@ def play_tracks(track_uris, access_token):
     print(url,data,headers,"PUT")
     request = Request(url,data, headers, method='PUT')
     try:
-        print(urlopen(request))
+        print(urlopen(request).read())
     except urllib.error.URLError as e:
         print(e.reason)
     
@@ -71,6 +71,15 @@ class MusicQueue:
         self.queue_dispatcher = Thread(target=self.run, args=(int(self.running_ind),))
         self.queue_dispatcher.start()
 
+    def drop(self, track_obj):
+        with self.track_queue.mutex:
+            try:
+                self.track_queue.queue.remove(track_obj)
+                return True
+            except ValueError as e:
+                print(e)
+                return False
+        
     def get_queue(self):
         print("get_Queue enter")
         with self.track_queue.mutex:
@@ -93,9 +102,11 @@ class MusicQueue:
     def add(self, song_query):
         access_token = request_access_token()
         search_result = search_track(song_query, access_token)
+        track = None
         if search_result:
             track = search_result[0]
-            if track['artists'][0]['name'].lower() in FORBIDDEN_ARTISTS:
+            track['timestamp'] = time.time()
+            if track['artists'][0]['name'].lower() in FORBIDDEN_ARTISTS and False:
                 message = "That artist is strictly forbidden"
             else:
                 self.track_queue.put(track)
@@ -103,7 +114,7 @@ class MusicQueue:
                 message = "Track: {}\nArtist: {}\nAlbum: {}".format(track['name'], track['artists'][0]['name'], track['album']['name'])
         else:
             message = "No match found for " + song_query
-        return message     
+        return (message, track)     
 
     def run(self, ind):
         while True:
