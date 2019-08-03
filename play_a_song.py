@@ -18,7 +18,6 @@ def request_access_token():
     data = urlencode(parameters).encode()
     request = Request(url, data, headers)
     response =  json.loads(urlopen(request).read())
-    print(response)
     return response['access_token']
 
 def search_track(query, access_token):
@@ -29,7 +28,6 @@ def search_track(query, access_token):
     
     request = Request(url+'?'+data, None, headers)
     response = json.loads(urlopen(request).read())
-    print(response)
     if not response['tracks']['items']:
         print("Error: Artist Not Found")
         return None
